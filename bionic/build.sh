@@ -3,7 +3,7 @@
 SIGN_KEY=B4D212C8
 
 sudo apt update
-sudo apt install -y gcc g++ gfortran gcc-4.9 g++-4.9 gfortran-4.9 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript
+sudo apt install -y gcc g++ gfortran gcc-6 g++-6 gfortran-6 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript
 
 if [ ! -d "boost_1_61_0" ]; then
 	wget -O boost-1.61.0.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2/download \
@@ -14,7 +14,7 @@ fi
 ROOT=$(pwd)
 
 if [ ! -d "boost-install" ]; then
-	(cd boost_1_61_0 && ./bootstrap.sh --prefix=/usr/rose --with-libraries=chrono,date_time,filesystem,iostreams,program_options,random,regex,serialization,signals,system,thread,wave && ./b2 --prefix=$ROOT/boost-install -sNO_BZIP2=1 toolset=gcc-4.9 install)
+	(cd boost_1_61_0 && ./bootstrap.sh --prefix=/usr/rose --with-libraries=chrono,date_time,filesystem,iostreams,program_options,random,regex,serialization,signals,system,thread,wave && ./b2 --prefix=$ROOT/boost-install -sNO_BZIP2=1 toolset=gcc-6 install)
 fi
 
 if [ ! -d "rose-develop" ]; then
@@ -27,7 +27,8 @@ if [ ! -f "rose-develop/configure" ]; then
 fi
 
 mkdir -p rose-build
-(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
+(cd rose-build && CC=gcc-6 CXX=g++-6 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-6 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=5.0)
+if [ "$?" != "0" ]; then exit 1; fi
 
 (cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
 
