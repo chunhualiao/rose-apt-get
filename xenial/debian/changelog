@@ -1,0 +1,11 @@
+rose (0.9.10.180-1) xenial; urgency=medium
+
+  * Fixed paths
+
+ -- Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com> Wed, 07 Mar 2019 01:31:00 +0200
+
+rose (0.9.10.180-0) xenial; urgency=medium
+
+  * Initial build
+
+ -- Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com> Wed, 07 Mar 2019 01:31:00 +0200

@@ -1,0 +1,12 @@
+Source: rose
+Maintainer: Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com>
+Section: devel
+Build-Depends: debhelper (>= 9)
+
+Package: rose
+Architecture: amd64
+Depends: libc6, libstdc++6, libgcc1, libicu55, openjdk-8-jre-headless, gcc, g++, gfortran
+Description: ROSE compiler infrastructure
+ ROSE compiler infrastructure
+ .
+ Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications.

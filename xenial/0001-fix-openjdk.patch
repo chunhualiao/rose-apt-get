@@ -1,0 +1,25 @@
+From 37958096765560768adce2644435143fe2174ade Mon Sep 17 00:00:00 2001
+From: Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com>
+Date: Thu, 7 Mar 2019 09:24:32 +0000
+Subject: [PATCH] fix openjdk
+
+---
+ config/support-java.m4 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/config/support-java.m4 b/config/support-java.m4
+index 5c422d1..28c5e0f 100644
+--- a/config/support-java.m4
++++ b/config/support-java.m4
+@@ -111,7 +111,7 @@ if test "x$USE_JAVA" = x1; then
+   AC_MSG_NOTICE([JAVA = "$JAVA"])
+ 
+     # Determine java version, e.g. java version "1.7.0_51"
+-    JAVA_VERSION=`${JAVA} -version 2>&1 | grep "java version" | sed 's/java version//' | sed 's/"//g'`
++    JAVA_VERSION=`${JAVA} -version 2>&1 | grep " version" | sed 's/ version//' | sed 's/"//g'`
+     JAVA_VERSION_MAJOR=`echo ${JAVA_VERSION} | awk 'BEGIN {FS="."} {print [$]1}'`
+     JAVA_VERSION_MINOR=`echo ${JAVA_VERSION} | awk 'BEGIN {FS="."} {print [$]2}'`
+     JAVA_VERSION_PATCH=`echo ${JAVA_VERSION} | awk 'BEGIN {FS="."} {print [$]3}' | awk 'BEGIN {FS="_"} {print [$]1}'`
+-- 
+2.7.4
+
