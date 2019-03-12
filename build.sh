@@ -27,9 +27,9 @@ if [ ! -f "rose-develop/configure" ]; then
 fi
 
 mkdir -p rose-build
-#(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
+(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
 
-#(cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
+(cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
 
 ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
 ROSE_ROOT=rose-$ROSE_VERSION
