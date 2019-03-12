@@ -27,11 +27,12 @@ if [ ! -f "rose-develop/configure" ]; then
 fi
 
 mkdir -p rose-build
-(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
+#(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
 
-(cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
+#(cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
 
-ROSE_ROOT=rose-$(cat rose-develop/ROSE_VERSION)
+ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
+ROSE_ROOT=rose-$ROSE_VERSION
 rm -rf $ROSE_ROOT
 mkdir -p $ROSE_ROOT/usr/rose
 cp -r rose-install/* $ROSE_ROOT/usr/rose
@@ -50,5 +51,7 @@ cp 10-rose.conf $ROSE_ROOT/etc/ld.so.conf.d
 
 mkdir -p $ROSE_ROOT/debian/
 cp -r debian/* $ROSE_ROOT/debian/
-tar cvfz rose_$(cat rose-develop/ROSE_VERSION).orig.tar.gz $ROSE_ROOT
+echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
+sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
+tar cfz rose_$(cat rose-develop/ROSE_VERSION).orig.tar.gz $ROSE_ROOT
 (cd $ROSE_ROOT/debian && debuild -S -sa -k$SIGN_KEY)

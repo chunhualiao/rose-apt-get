@@ -1,7 +1,0 @@
-#!/bin/bash
-
-case "$1" in
-remove|purge)
-	ldconfig
-	;;
-esac

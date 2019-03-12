@@ -1,4 +1,4 @@
-rose (0.9.10.180-0) bionic; urgency=medium
+rose ($VERSION-0) xenial; urgency=medium
 
   * Initial build
 

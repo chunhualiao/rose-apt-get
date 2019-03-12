@@ -1,7 +1,0 @@
-#!/bin/bash
-
-case "$1" in
-configure)
-	ldconfig
-	;;
-esac

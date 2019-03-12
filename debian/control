@@ -5,7 +5,7 @@ Build-Depends: debhelper (>= 9)
 
 Package: rose
 Architecture: amd64
-Depends: libc6, libstdc++6, libgcc1, libicu55, openjdk-8-jre-headless, gcc, g++, gfortran
+Depends: libc6, libstdc++6, libgcc1, libicu55, openjdk-8-jre-headless, gcc-4.9, g++-4.9, gfortran-4.9
 Description: ROSE compiler infrastructure
  ROSE compiler infrastructure
  .
