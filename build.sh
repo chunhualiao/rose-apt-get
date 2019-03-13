@@ -1,25 +1,14 @@
 #!/bin/bash
 
-SIGN_KEY=B4D212C8
+ROOT=$(pwd)
+SIGN_KEY=$(cat $ROOT/pubkey)
 
 sudo apt update
-sudo apt install -y gcc g++ gfortran gcc-4.9 g++-4.9 gfortran-4.9 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript
-
-if [ ! -d "boost_1_61_0" ]; then
-	wget -O boost-1.61.0.tar.bz2 http://sourceforge.net/projects/boost/files/boost/1.61.0/boost_1_61_0.tar.bz2/download \
-        	&& tar xf boost-1.61.0.tar.bz2 \
-        	&& rm -f boost-1.61.0.tar.bz2
-fi
-
-ROOT=$(pwd)
-
-if [ ! -d "boost-install" ]; then
-	(cd boost_1_61_0 && ./bootstrap.sh --prefix=/usr/rose --with-libraries=chrono,date_time,filesystem,iostreams,program_options,random,regex,serialization,signals,system,thread,wave && ./b2 --prefix=$ROOT/boost-install -sNO_BZIP2=1 toolset=gcc-4.9 install)
-fi
+sudo apt install -y gcc g++ gfortran gcc-5 g++-5 gfortran-5 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
 
 if [ ! -d "rose-develop" ]; then
 	git clone https://github.com/rose-compiler/rose-develop
-	(cd rose-develop && git am < ../0001-fix-openjdk.patch)
+	(cd rose-develop && git am < ../0001-fix-rosePublicConfig.h-DESTDIR.patch)
 fi
 
 if [ ! -f "rose-develop/configure" ]; then
@@ -27,16 +16,17 @@ if [ ! -f "rose-develop/configure" ]; then
 fi
 
 mkdir -p rose-build
-(cd rose-build && CC=gcc-4.9 CXX=g++-4.9 ../rose-develop/configure --prefix=$ROOT/rose-install --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=$ROOT/boost-install --with-gfortran=/usr/bin/gfortran-4.9 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
+(cd rose-build && CC=gcc-5 CXX=g++-5 CXXFLAGS= ../rose-develop/configure --prefix=/usr/rose --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --with-gfortran=/usr/bin/gfortran-5 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.9)
+if [ "$?" != "0" ]; then exit 1; fi
 
-(cd rose-build && make core -j$(nproc) && make install-core -j$(nproc))
+(cd rose-build && make core -j$(nproc) && make DESTDIR=$ROOT/rose-install install-core -j$(nproc))
+if [ "$?" != "0" ]; then exit 1; fi
 
 ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
 ROSE_ROOT=rose-$ROSE_VERSION
 rm -rf $ROSE_ROOT
-mkdir -p $ROSE_ROOT/usr/rose
-cp -r rose-install/* $ROSE_ROOT/usr/rose
-cp -r boost-install/lib/* $ROSE_ROOT/usr/rose/lib
+mkdir $ROSE_ROOT
+cp -r rose-install/* $ROSE_ROOT
 cp -r runRoseUtil $ROSE_ROOT/usr/rose/bin
 mkdir -p $ROSE_ROOT/usr/bin
 
@@ -53,5 +43,5 @@ mkdir -p $ROSE_ROOT/debian/
 cp -r debian/* $ROSE_ROOT/debian/
 echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
 sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
-tar cfz rose_$(cat rose-develop/ROSE_VERSION).orig.tar.gz $ROSE_ROOT
-(cd $ROSE_ROOT/debian && debuild -S -sa -k$SIGN_KEY)
+tar cfz rose_$(cat rose-develop/ROSE_VERSION)-2.orig.tar.gz $ROSE_ROOT
+(cd $ROSE_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)

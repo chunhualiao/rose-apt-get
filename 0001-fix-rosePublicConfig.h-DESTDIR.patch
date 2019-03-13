@@ -1,0 +1,34 @@
+From 9bb1563a54acdbf6e9c169a758a08b9200372041 Mon Sep 17 00:00:00 2001
+From: Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com>
+Date: Wed, 13 Mar 2019 11:04:13 +0000
+Subject: [PATCH] fix rosePublicConfig.h DESTDIR
+
+---
+ Makefile.am | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index 80af752..214d04b 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -138,7 +138,7 @@ endif
+ if ROSE_BUILD_PROJECTS_DIRECTORY_SUPPORT
+ 	$(MAKE) install -C $(top_builddir)/tutorial
+ endif
+-	cp rosePublicConfig.h $(pkgincludedir)
++	cp rosePublicConfig.h $(DESTDIR)$(pkgincludedir)
+ 
+ install-compass: install-core
+ 	$(MAKE) -C $(top_builddir)/projects/compass
+@@ -150,7 +150,7 @@ install-compass: install-core
+ # don't want to install anything else (perhaps because it doesn't compile). [Robb Matzke, 2016-03-07]
+ install-rose-library: install-data-local install-testprojDATA
+ 	$(MAKE) -C $(top_builddir)/src install
+-	cp rosePublicConfig.h $(pkgincludedir)
++	cp rosePublicConfig.h $(DESTDIR)$(pkgincludedir)
+ 	$(MAKE) -C $(top_builddir)/python install
+ 
+ # Build a binary release of the ROSE library.  This assumes that you're running in the RMC-2 environment because it uses
+-- 
+2.7.4
+
