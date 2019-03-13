@@ -1,6 +1,12 @@
 #!/bin/bash
 
 ROOT=$(pwd)
+
+if [ ! -f "$ROOT/pubkey" ]; then
+	keyVal=$(gpg --list-keys | awk '/sub/{if (length($2) > 0) print $2}')
+	echo "${keyVal##*/}" > $ROOT/pubkey
+fi
+
 SIGN_KEY=$(cat $ROOT/pubkey)
 
 sudo apt update
