@@ -1,5 +1,5 @@
 Source: rose
-Maintainer: Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com>
+Maintainer: Chunhua Liao <chunhualiao@gmail.com>
 Section: devel
 Build-Depends: debhelper (>= 9)
 
