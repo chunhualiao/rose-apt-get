@@ -71,9 +71,9 @@ Assuming the user account is user1 again, within Ubuntu, type the following to i
     sudo apt-get install rose   
 ```
 
-The installed ROSE binaries are located under /usr/rose with symbolic links under /usr/bin 
+The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
 
 ```
 /usr/rose$ ls
-bin  include  intervals.h  lib  mint-1.0.0
+bin include lib  
 ```
