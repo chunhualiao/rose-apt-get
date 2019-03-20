@@ -1,5 +1,13 @@
 #!/bin/bash
 
+#--------- check user permission
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root since we will use --prefix=/usr/rose for the installation, like sudo this-script"
+  exit
+#else
+#  echo "You are running with root priviledge as expected..."
+fi
+
 ROOT=$(pwd)
 
 #-------------------- install dependent software
@@ -16,8 +24,14 @@ if [ ! -f "rose-develop/configure" ]; then
 	(cd rose-develop && ./build)
 fi
 
-mkdir -p rose-build
-(cd rose-build && CC=gcc-5 CXX=g++-5 CXXFLAGS= ../rose-develop/configure --prefix=/usr/rose --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --with-gfortran=/usr/bin/gfortran-5 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.12)
+# support reentry of this script
+if [ ! -d "rose-build" ]; then
+       mkdir -p rose-build
+fi
+
+# note that --prefix is set to be /usr/rose
+# so this script must use sudo priviledge to run!!
+(cd rose-build && CC=gcc-5 CXX=g++-5 CXXFLAGS= ../rose-develop/configure --prefix=/usr/rose --with-C_OPTIMIZE=-O0 --with-CXX_OPTIMIZE=-O0 --with-C_DEBUG='-g' --with-CXX_DEBUG='-g' --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --with-gfortran=/usr/bin/gfortran-5 --enable-languages=c,c++,fortran --enable-projects-directory --enable-edg_version=4.9)
 if [ "$?" != "0" ]; then exit 1; fi
 
 #-------------------- build ROSE
@@ -28,11 +42,18 @@ if [ "$?" != "0" ]; then exit 1; fi
 
 ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
 ROSE_ROOT=rose-$ROSE_VERSION
-rm -rf $ROSE_ROOT
-mkdir $ROSE_ROOT
+
+# support reentry of this script
+if [ ! -d "$ROSE_ROOT" ]; then
+#  rm -rf $ROSE_ROOT
+  mkdir $ROSE_ROOT
+fi
+
 cp -r rose-install/* $ROSE_ROOT
 cp -r runRoseUtil $ROSE_ROOT/usr/rose/bin
-mkdir -p $ROSE_ROOT/usr/bin
+if [ ! -d "$ROSE_ROOT/usr/bin" ]; then
+  mkdir -p $ROSE_ROOT/usr/bin
+fi
 
 UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1  dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
 
