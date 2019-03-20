@@ -2,7 +2,7 @@
 
 ## Registering an account with https://launchpad.net
 
-If you don't yet have an account there, you have to create one first
+If you don't yet have an account there, you have to create one first there. 
 
 ## Generating GPG key
 
