@@ -71,6 +71,14 @@ Assuming the user account is user1 again, within Ubuntu, type the following to i
     sudo apt-get install rose   
 ```
 
+We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 16.04):
+
+```
+sudo add-apt-repository ppa:liaoch/rose
+sudo apt-get update
+sudo apt-get install rose
+```
+
 The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
 
 ```
