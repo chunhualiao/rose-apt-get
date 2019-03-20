@@ -41,48 +41,78 @@ if [ "$?" != "0" ]; then exit 1; fi
 if [ "$?" != "0" ]; then exit 1; fi
 
 ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
-ROSE_ROOT=rose-$ROSE_VERSION
+ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
 
 # support reentry of this script
-if [ ! -d "$ROSE_ROOT" ]; then
-#  rm -rf $ROSE_ROOT
-  mkdir $ROSE_ROOT
+if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT" ]; then
+#  rm -rf $ROSE_DEBIAN_BINARY_ROOT
+  mkdir $ROSE_DEBIAN_BINARY_ROOT
 fi
 
-cp -r rose-install/* $ROSE_ROOT
-cp -r runRoseUtil $ROSE_ROOT/usr/rose/bin
-if [ ! -d "$ROSE_ROOT/usr/bin" ]; then
-  mkdir -p $ROSE_ROOT/usr/bin
+cp -r rose-install/* $ROSE_DEBIAN_BINARY_ROOT
+cp -r runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/rose/bin
+if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
+  mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
 
 UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1  dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
 
 for util in $UTILS; do
-	ln -fs ../rose/bin/runRoseUtil $ROSE_ROOT/usr/bin/$util
+	ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util
 done
 
-mkdir -p $ROSE_ROOT/etc/ld.so.conf.d
-cp 10-rose.conf $ROSE_ROOT/etc/ld.so.conf.d
+mkdir -p $ROSE_DEBIAN_BINARY_ROOT/etc/ld.so.conf.d
+cp 10-rose.conf $ROSE_DEBIAN_BINARY_ROOT/etc/ld.so.conf.d
 
-mkdir -p $ROSE_ROOT/debian/
-cp -r debian/* $ROSE_ROOT/debian/
-echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
-sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_ROOT/debian/changelog
-tar cfz rose_$(cat rose-develop/ROSE_VERSION)-2.orig.tar.gz $ROSE_ROOT
 
+#================== make the debian package in a work directory inside the binary release candidate dir.
+ROSE_VERSION=$(cat rose-develop/ROSE_VERSION)
+ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
+
+if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/debian" ]; then
+  mkdir -p $ROSE_DEBIAN_BINARY_ROOT/debian/
+fi
+
+cp -r debian/* $ROSE_DEBIAN_BINARY_ROOT/debian/
+echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+
+
+# remove possible stale package
+rm -rf rose_$(cat rose-develop/ROSE_VERSION)-2.orig.tar.gz
+
+tar cfz rose_$(cat rose-develop/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT
 
 #--------sign your binary 
+ROOT=`pwd`
+echo "current path is $ROOT"
+
 if [ ! -f "$ROOT/pubkey" ]; then
-	keyVal=$(gpg --list-keys | awk '/sub/{if (length($2) > 0) print $2}')
-	echo "${keyVal##*/}" > $ROOT/pubkey
+        keyVal=$(gpg --list-keys | awk '/sub/{if (length($2) > 0) print $2}')
+        echo "${keyVal##*/}" > $ROOT/pubkey
 fi
 
 SIGN_KEY=$(cat $ROOT/pubkey)
 
+echo $SIGN_KEY
 if [ "x$SIGN_KEY" == "x" ]; then
-  echo "Error, cannot find your public GPG key, aborting..."
-  echo "Please create or import your key pairs to this machine"
-  exit 1;
+
+#somehow pubkey may be emtpy!
+# we regenerate it again
+  rm -rf $ROOT/pubkey
+  keyVal=$(gpg --list-keys | awk '/sub/{if (length($2) > 0) print $2}')
+  echo "${keyVal##*/}" > $ROOT/pubkey
+
+  if [ "x$SIGN_KEY" == "x" ]; then
+
+    echo "Error, cannot find your public GPG key, aborting..."
+    echo "Please create or import your key pairs to this machine"
+    exit 1;
+  fi
+else
+  echo the public key found is: $SIGN_KEY
 fi
 
-(cd $ROSE_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
+(cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
+
+
