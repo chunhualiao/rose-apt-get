@@ -61,3 +61,12 @@ dput <ppa path> <file with .changes extension>
 dput ppa:user1/rose rose_0.9.10.198-0_source.changes
 
 ```
+## Using the PPA
+
+Assuming the user account is user1 again, within Ubuntu, type the following to install ROSE. 
+
+```
+    sudo add-apt-repository ppa:user1/rose
+    sudo apt-get update
+    sudo apt-get install rose   
+```
