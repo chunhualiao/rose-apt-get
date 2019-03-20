@@ -39,6 +39,16 @@ gpg --send-keys --keyserver keyserver.ubuntu.com 12345678
 
 To build a package simply run build.sh script. It installs all the dependencies, fetches the source code, builds it, and packs into a package.
 
+In the end, there should be several new files generated under the current directory, such as
+
+* rose-0.9.10.198
+* rose_0.9.10.198-0.dsc
+* rose_0.9.10.198-0_source.build
+* rose_0.9.10.198-0_source.changes
+* rose_0.9.10.198-0.tar.gz
+* rose_0.9.10.198-2.orig.tar.gz
+
+
 ## Publishing
 
 You have to create a new PPA under your account with https://launchpad.net first. Assuming your account name is user1, go to https://launchpad.net/~user1 and click on "Create a new PPA" . We suggest to name your PPA as rose, then the PPA path to your binariy package is ppa:user1/rose 
@@ -47,6 +57,7 @@ You have to create a new PPA under your account with https://launchpad.net first
 ```
 dput <ppa path> <file with .changes extension>
 
-dput ppa:user1/rose <file with .changes extension>
+# example command line
+dput ppa:user1/rose rose_0.9.10.198-0_source.changes
 
 ```
