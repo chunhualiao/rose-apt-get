@@ -1,4 +1,6 @@
 #!/bin/sh
-
+# this is a wrapper for all rose tools
+# each tool will get a soft link to this file, with the name indicating which tool to actually run.
+# The build.sh script will create symbolic links to each tool
 ROSE_ROOT=/usr/rose
 LD_LIBRARY_PATH=/usr/lib/jvm/java-8-openjdk-amd64/jre/lib/amd64/server exec $ROSE_ROOT/bin/$(basename $0) $@
