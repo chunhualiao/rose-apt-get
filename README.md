@@ -31,8 +31,13 @@ To build a package simply run build.sh script. It installs all the dependencies,
 
 ## Publishing
 
-You have 
+
+You have to create a new PPA under your account with https://launchpad.net first. Assuming your account name is user1, go to https://launchpad.net/~user1 and click on "Create a new PPA" . We suggest to name your PPA as rose, then the PPA path to your binariy package is ppa:user1/rose 
+ 
 
 ```
 dput <ppa path> <file with .changes extension>
+
+dput ppa:user1/rose <file with .changes extension>
+
 ```
