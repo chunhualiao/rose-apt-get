@@ -1,5 +1,9 @@
 # ROSE Compiler debian package creator
 
+## Overview
+
+This repo stores all info. related to how to create a Personal Package Archive (PPA) for the ROSE compiler framework. Personal Package Archives (PPAs) are software repositories designed for Ubuntu users to easily distribute and install software. PPAs are often used to distribute pre-release software so that it can be tested.
+
 ## Directory layout
 
 The subdirectory debian contains control, postinst, postrm ,etc to indicate dependencies and things to do after installation or uninstallation
