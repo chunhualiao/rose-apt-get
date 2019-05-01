@@ -28,15 +28,15 @@ Find the key of your public key (the 8-character string after pub 2048R/ below),
 
 ```
 gpg --fingerprint
-/home/user1/.gnupg/pubring.gpg
+/home/user1/.gnupg/pubring.kbx
 -----------------------------
-pub   2048R/12345678 2019-03-14
-      Key fingerprint = XXXX xxxx xxxx xxxx xxxx  xxxx xxxx xxxx xxxx XXXX
-uid                  You name  <user1@email.com>
-sub   2048R/xxxxXXAA 2019-03-14
+pub   rsa4096 2019-04-28
+      Key fingerprint = XXXX xxxx xxxx xxxx xxxx  xxxx xxxx xxxx yyyy YYYY
+uid                  Your name  <user1@email.com>
+sub   rsa4096 2019-04-28
 
 
-gpg --send-keys --keyserver keyserver.ubuntu.com 12345678 
+gpg --send-keys --keyserver keyserver.ubuntu.com yyyyYYYY 
 ```
 
 ## Building
@@ -45,12 +45,12 @@ To build a package simply run build.sh script. It installs all the dependencies,
 
 In the end, there should be several new files generated under the current directory, such as
 
-* rose-0.9.10.198
-* rose_0.9.10.198-0.dsc
-* rose_0.9.10.198-0_source.build
-* rose_0.9.10.198-0_source.changes
-* rose_0.9.10.198-0.tar.gz
-* rose_0.9.10.198-2.orig.tar.gz
+* rose-0.9.10.236
+* rose_0.9.10.236-0.dsc
+* rose_0.9.10.236-0_source.build
+* rose_0.9.10.236-0_source.changes
+* rose_0.9.10.236-0.tar.gz
+* rose_0.9.10.236-2.orig.tar.gz
 
 
 ## Publishing
@@ -62,7 +62,7 @@ You have to create a new PPA under your account with https://launchpad.net first
 dput <ppa path> <file with .changes extension>
 
 # example command line
-dput ppa:user1/rose rose_0.9.10.198-0_source.changes
+dput ppa:user1/rose rose_0.9.10.236-0_source.changes
 
 ```
 ## Using the PPA
@@ -75,13 +75,22 @@ Assuming the user account is user1 again, within Ubuntu, type the following to i
     sudo apt-get install rose   
 ```
 
-We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 16.04):
+We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 18.10):
 
 ```
-sudo add-apt-repository ppa:liaoch/rose
+sudo add-apt-repository ppa:gleison14051994/rose
 sudo apt-get update
 sudo apt-get install rose
 ```
+
+Some users related that sometimes the function "\__builtin_bswap16" cannot be found after the installation using this apt-get. To fix that, we suggest you to run the follow command line:
+
+```
+sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' /usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
+```
+
+It will replace all uses of "\__builtin_bswap16" to a simillar macro well defined.
+
 
 The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
 
