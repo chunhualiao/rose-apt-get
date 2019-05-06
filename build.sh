@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -e 
 #--------- check user permission
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root since we will use --prefix=/usr/rose for the installation, like sudo this-script"
