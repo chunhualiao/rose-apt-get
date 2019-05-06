@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 #--------- check user permission
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root since we will use --prefix=/usr/rose for the installation, like sudo this-script"
@@ -18,6 +18,7 @@ sudo apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git
 if [ ! -d "rose" ]; then
 	git clone https://github.com/rose-compiler/rose
 	(cd rose && git am < ../0001-fix-rosePublicConfig.h-DESTDIR.patch)
+        if [ "$?" != "0" ]; then exit 1; fi
 fi
 
 if [ ! -f "rose/configure" ]; then
@@ -37,7 +38,7 @@ if [ "$?" != "0" ]; then exit 1; fi
 #-------------------- build ROSE
 # -j$(nproc) may cause memory consumption issue on a virtual machine with limited memory. We use 2 process to be safe
 #(cd rose-build && make core -j$(nproc) && make DESTDIR=$ROOT/rose-install install-core -j$(nproc))
-(cd rose-build && make core -j2 && make install-core -j2)
+(cd rose-build && make core -j2 && make DESTDIR=$ROOT/rose-install install-core -j2)
 if [ "$?" != "0" ]; then exit 1; fi
 
 sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' /usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
