@@ -17,7 +17,7 @@ sudo apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
 	git clone https://github.com/rose-compiler/rose
-	(cd rose && git am < ../0001-fix-rosePublicConfig.h-DESTDIR.patch)
+	(patch -p3 rose/Makefile.am 0001-fix-rosePublicConfig.h-DESTDIR.patch)
         if [ "$?" != "0" ]; then exit 1; fi
 fi
 
@@ -38,11 +38,17 @@ if [ "$?" != "0" ]; then exit 1; fi
 #-------------------- build ROSE
 # -j$(nproc) may cause memory consumption issue on a virtual machine with limited memory. We use 2 process to be safe
 #(cd rose-build && make core -j$(nproc) && make DESTDIR=$ROOT/rose-install install-core -j$(nproc))
-(cd rose-build && make core -j2 && make DESTDIR=$ROOT/rose-install install-core -j2)
+#(cd rose-build e -j4)
+
+#(cd rose-build && make core -j4)
+#if [ "$?" != "0" ]; then exit 1; fi
+
+export DESTDIR=$ROOT/rose-install
+(cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j4)
 if [ "$?" != "0" ]; then exit 1; fi
 
-sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' /usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
-
+sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
+ 
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
 ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
 
@@ -57,10 +63,11 @@ if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
 
-UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1  dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
+UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1 dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
 
 for util in $UTILS; do
-	ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util
+	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
+	if [ "$?" != "0" ]; then exit 1; fi
 done
 
 mkdir -p $ROSE_DEBIAN_BINARY_ROOT/etc/ld.so.conf.d
