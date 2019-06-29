@@ -76,7 +76,7 @@ Assuming the user account is user1 again, within Ubuntu, type the following to i
     sudo apt-get install rose   
 ```
 
-We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 18.10):
+We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 18.04 bionic):
 
 ```
 sudo apt-get install -y software-properties-common
@@ -84,15 +84,6 @@ sudo add-apt-repository ppa:gleison14051994/rose
 sudo apt-get update
 sudo apt-get install rose
 ```
-
-Some users related that sometimes the function "\__builtin_bswap16" cannot be found after the installation using this apt-get. To fix that, we suggest you to run the follow command line:
-
-```
-sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' /usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
-```
-
-It will replace all uses of "\__builtin_bswap16" to a simillar macro well defined.
-
 
 The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
 
