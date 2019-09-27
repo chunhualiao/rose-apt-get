@@ -63,7 +63,7 @@ if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
 
-UTILS= "ArrayProcessor \
+UTILS="ArrayProcessor \
 KeepGoingTranslator \
 astCopyReplTest \
 astRewriteExample1 \
