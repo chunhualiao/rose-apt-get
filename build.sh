@@ -11,8 +11,8 @@ fi
 ROOT=$(pwd)
 
 #-------------------- install dependent software
-sudo apt update
-sudo apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript python lsb-core perl-doc libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
+#apt update
+#apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript python lsb-core perl-doc libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
 
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
@@ -44,7 +44,7 @@ if [ "$?" != "0" ]; then exit 1; fi
 #if [ "$?" != "0" ]; then exit 1; fi
 
 export DESTDIR=$ROOT/rose-install
-(cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j4)
+(cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j40)
 if [ "$?" != "0" ]; then exit 1; fi
 
 sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
@@ -63,7 +63,39 @@ if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
 
-UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1 dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
+UTILS= "ArrayProcessor \
+KeepGoingTranslator \
+astCopyReplTest \
+astRewriteExample1 \
+autoPar \
+autoTuning \
+codeInstrumentor \
+compassEmptyMain \
+compassMain \
+compassVerifier \
+defaultTranslator \
+dotGenerator \
+dotGeneratorWholeASTGraph \
+extractMPISkeleton \
+generateSignatures \
+identityTranslator \
+libtool \
+mangledNameDumper \
+measureTool \
+moveDeclarationToInnermostScope \
+pdfGenerator \
+preprocessingInfoDumper \
+qualifiedNameDumper \
+rajaChecker \
+rose-c++ \
+rose-cc \
+rose-compiler \
+rose-config \
+roseupcc \
+runRoseUtil \
+sampleCompassSubset \
+summarizeSignatures \
+typeforge"
 
 for util in $UTILS; do
 	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
