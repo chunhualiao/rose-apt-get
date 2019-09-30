@@ -16,8 +16,9 @@ ROOT=$(pwd)
 
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
-	git clone https://github.com/rose-compiler/rose
-	(patch -p3 rose/Makefile.am 0001-fix-rosePublicConfig.h-DESTDIR.patch)
+	git clone -b develop https://github.com/rose-compiler/rose
+	sed "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
+	mv temp.txt rose/Makefile.am
         if [ "$?" != "0" ]; then exit 1; fi
 fi
 
