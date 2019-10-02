@@ -5,7 +5,7 @@ Build-Depends: debhelper (>= 9)
 
 Package: rose
 Architecture: amd64
-Depends: openjdk-8-jre-headless, gcc-7, g++-7, gfortran-7, libboost-all-dev
+Depends: libgcc1, openjdk-8-jre-headless, gcc-7, g++-7, gfortran-7, libboost-chrono-dev, libboost-date-time-dev, libboost-filesystem-dev, libboost-iostreams-dev, libboost-program-options-dev, libboost-random-dev, libboost-regex-dev, libboost-serialization-dev, libboost-signals-dev, libboost-system-dev, libboost-thread-dev, libboost-wave-dev
 Description: ROSE compiler infrastructure
  ROSE compiler infrastructure
  .
