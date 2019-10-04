@@ -118,6 +118,8 @@ cp -r debian/* $ROSE_DEBIAN_BINARY_ROOT/debian/
 echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
+echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
 # remove possible stale package
 rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
