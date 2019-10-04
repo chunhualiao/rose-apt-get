@@ -1,5 +1,5 @@
 rose ($VERSION-0) bionic; urgency=medium
 
-  * Initial build
+  * Release build
 
- -- Oleh Zymnytskiy <oleh.g.zymnytskiy@gmail.com> Wed, 07 Mar 2019 01:31:00 +0200
+ -- rose compiler <hudson-rose@llnl.gov> `date -R`
