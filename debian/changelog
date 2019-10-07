@@ -2,4 +2,4 @@ rose ($VERSION-0) bionic; urgency=medium
 
   * Release build
 
- -- rose compiler <hudson-rose@llnl.gov> `date -R`
+ -- rose compiler <hudson-rose@llnl.gov> DATE

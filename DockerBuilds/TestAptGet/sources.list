@@ -3,8 +3,8 @@
 deb http://archive.ubuntu.com/ubuntu/ bionic main restricted
 # deb-src http://archive.ubuntu.com/ubuntu/ bionic main restricted
 
-deb http://ppa.launchpad.net/rosecompiler/rose-development/ubuntu bionic main 
-#deb-src http://ppa.launchpad.net/rosecompiler/rose-development/ubuntu bionic main 
+deb http://ppa.launchpad.net/rosecompiler/rose/ubuntu bionic main 
+#deb-src http://ppa.launchpad.net/rosecompiler/rose/ubuntu bionic main 
 
 ## Major bug fix updates produced after the final release of the
 ## distribution.

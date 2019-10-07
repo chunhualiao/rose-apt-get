@@ -4,7 +4,8 @@ RUN apt-get update -y && \
         software-properties-common 
 COPY sources.list /etc/apt/sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 5a4c7db8f95ad138
-RUN apt-get update --allow-insecure-repositories
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys DF61639161C9A719
+RUN apt-get update
 	
 #Start after here to maintain keys and repo	
 COPY rose_hello-world.c /root/rose_hello-world.c 
