@@ -55,16 +55,24 @@ ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
 
 # support reentry of this script
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT" ]; then
-  mkdir $ROSE_DEBIAN_BINARY_ROOT
+  mkdir -p $ROSE_DEBIAN_BINARY_ROOT ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/bin
 fi
 
-cp -r rose-install/* $ROSE_DEBIAN_BINARY_ROOT
+mkdir $ROSE_DEBIAN_BINARY_ROOT/include $ROSE_DEBIAN_BINARY_ROOT/lib $ROSE_DEBIAN_BINARY_ROOT/bin
+cp -r rose-install/lib/* $ROSE_DEBIAN_BINARY_ROOT/lib
+cp -r rose-install/include/* $ROSE_DEBIAN_BINARY_ROOT/include
 cp -r runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/rose/bin
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
-  mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
+  mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/usr/bin
 fi
 
-UTILS="ArrayProcessor \
+CORE="rose-c++ \
+rose-cc \
+rose-compiler \
+rose-config \
+runRoseUtil"
+
+TOOLS="ArrayProcessor \
 KeepGoingTranslator \
 astCopyReplTest \
 astRewriteExample1 \
@@ -88,23 +96,28 @@ pdfGenerator \
 preprocessingInfoDumper \
 qualifiedNameDumper \
 rajaChecker \
-rose-c++ \
-rose-cc \
-rose-compiler \
-rose-config \
 roseupcc \
-runRoseUtil \
 sampleCompassSubset \
 summarizeSignatures \
 typeforge"
 
-for util in $UTILS; do
+for util in $CORE; do
+	cp rose-install/bin/$util $ROSE_DEBIAN_BINARY_ROOT/bin/$util
 	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
+	if [ "$?" != "0" ]; then exit 1; fi
+done
+
+for util in $TOOLS; do
+	cp rose-install/bin/$util ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/bin/$util
+	(ln -fs ../rose/bin/runRoseUtil ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/usr/bin/$util)
 	if [ "$?" != "0" ]; then exit 1; fi
 done
 
 mkdir -p $ROSE_DEBIAN_BINARY_ROOT/etc/ld.so.conf.d
 cp 10-rose.conf $ROSE_DEBIAN_BINARY_ROOT/etc/ld.so.conf.d
+
+mkdir -p ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/etc/ld.so.conf.d
+cp 10-rose.conf ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/etc/ld.so.conf.d
 
 #================== make the debian package in a work directory inside the binary release candidate dir.
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
@@ -112,19 +125,27 @@ ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
 
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/debian" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/debian/
+  mkdir -p ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/debian/
 fi
 
 cp -r debian/* $ROSE_DEBIAN_BINARY_ROOT/debian/
+
 echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
 echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
+cp -r $ROSE_DEBIAN_BINARY_ROOT/debian ${ROSE_DEBIAN_BIANRY_ROOT}_TOOLS/debian
+rm -f ${ROSE_DEBIAN_BIANRY_ROOT}_TOOLS/debian/control
+cp tools_control ${ROSE_DEBIAN_BIANRY_ROOT}_TOOLS/debian/control
+
 # remove possible stale package
 rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
+rm -rf rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
 
 tar cfz rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT
+tar cfz rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS
 
 #--------sign your binary 
 ROOT=`pwd`
@@ -157,5 +178,5 @@ else
 fi
 
 (cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
-
+(cd ${ROSE_DEBIAN_BINARY_ROOT}_TOOLS/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
 
