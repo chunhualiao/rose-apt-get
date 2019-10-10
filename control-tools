@@ -1,4 +1,4 @@
-Source: rose
+Source: rose-tools
 Maintainer: ROSE Compiler <hudson-rose@llnl.gov>
 Section: devel
 Build-Depends: debhelper (>= 9)
