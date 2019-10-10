@@ -63,8 +63,14 @@ cp -r runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/rose/bin
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
+CORE="rose-c++ \
+rose-cc \
+rose-config \
+rose-compiler \
+libtool \
+runRoseUtil"
 
-UTILS="ArrayProcessor \
+TOOLS="ArrayProcessor \
 KeepGoingTranslator \
 astCopyReplTest \
 astRewriteExample1 \
@@ -80,7 +86,6 @@ dotGeneratorWholeASTGraph \
 extractMPISkeleton \
 generateSignatures \
 identityTranslator \
-libtool \
 mangledNameDumper \
 measureTool \
 moveDeclarationToInnermostScope \
@@ -88,17 +93,12 @@ pdfGenerator \
 preprocessingInfoDumper \
 qualifiedNameDumper \
 rajaChecker \
-rose-c++ \
-rose-cc \
-rose-compiler \
-rose-config \
 roseupcc \
-runRoseUtil \
 sampleCompassSubset \
 summarizeSignatures \
 typeforge"
 
-for util in $UTILS; do
+for util in $CORE $TOOLS; do
 	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
 	if [ "$?" != "0" ]; then exit 1; fi
 done
@@ -121,10 +121,25 @@ sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelo
 echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
+#Split Package
+cp -r $ROSE_DEBIAN_BIANRY_ROOT tools-$ROSE_DEBIAN_BIANRY_ROOT
+
+for util in $TOOLS; do
+	rm $ROSE_DEBIAN_BIANRY_ROOT/usr/bin/$util $ROSE_DEBIAN_BIANRY_ROOT/usr/rose/bin/$util
+done
+
+for util in $CORE; do
+	rm tools-$ROSE_DEBIAN_BIANRY_ROOT/usr/bin/$util tools-$ROSE_DEBIAN_BIANRY_ROOT/usr/rose/bin/$util
+done
+rm -rf tools-$ROSE_DEBIAN_BIANRY_ROOT/usr/rose/include tools-$ROSE_DEBIAN_BIANRY_ROOT/usr/rose/lib
+cp control-tools tools-$ROSE_DEBIAN_BIANRY_ROOT/debian/control
+
 # remove possible stale package
 rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
+rm -rf rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
 
 tar cfz rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT
+tar cfz rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz tools-$ROSE_DEBIAN_BINARY_ROOT
 
 #--------sign your binary 
 ROOT=`pwd`
@@ -157,5 +172,5 @@ else
 fi
 
 (cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
-
+(cd tools-$ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
 
