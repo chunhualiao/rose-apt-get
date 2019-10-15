@@ -8,6 +8,11 @@ if [ "$EUID" -ne 0 ]
 #  echo "You are running with root priviledge as expected..."
 fi
 
+if [ $# == 0 ]; then
+	APT_ROSE_VERSION=0
+else
+	APT_ROSE_VERSION=$1
+fi
 ROOT=$(pwd)
 
 #-------------------- install dependent software
@@ -16,9 +21,9 @@ ROOT=$(pwd)
 
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
-	git clone -b develop https://github.com/rose-compiler/rose
-	sed "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
-	mv temp.txt rose/Makefile.am
+	git clone https://github.com/rose-compiler/rose
+	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
+	echo $(cat rose/ROSE_VERSION).$APT_ROSE_VERSION >|rose/ROSE_VERSION
         if [ "$?" != "0" ]; then exit 1; fi
 fi
 

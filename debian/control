@@ -9,7 +9,7 @@ Depends: libgcc1, openjdk-8-jre-headless, gcc-7, g++-7, gfortran-7, libboost-chr
 Description: ROSE compiler infrastructure
  ROSE compiler infrastructure
  .
- Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Contains the core functions of ROSE.
+ Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Contains the core functions of ROSE. Configured for c and c++.
 
 Package: rose-tools
 Architecture: amd64
@@ -17,4 +17,4 @@ Depends: rose
 Description: ROSE compiler infrastructure tools
  ROSE compiler infrastructure
  .
- Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Includes many ROSE based tools.
+ Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Includes many ROSE based tools. Configured for c and c++.
