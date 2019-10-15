@@ -45,9 +45,21 @@ if [ "$?" != "0" ]; then exit 1; fi
 #if [ "$?" != "0" ]; then exit 1; fi
 
 export DESTDIR=$ROOT/rose-install
+# Build Core
+(cd rose-build && make DESTDIR=$ROOT/rose-install install-core -j40)
+(cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose.find)
+(cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose.bin)
+echo "runRoseUtil" >>MakeInstallFile/rose.bin
+# Build Tools
 (cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j40)
+(cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose-tools.find)
+(cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose-tools.bin)
+echo "runRoseUtil" >>MakeInstallFile/rose-tools.bin
 if [ "$?" != "0" ]; then exit 1; fi
 
+# Make .install Files
+(cd MakeInstallFile && python BuildInstall.py)
+echo "usr/rose/bin/runRoseUtil /usr/rose/bin" >>MakeInstallFile/rose.install
 sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
  
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
@@ -64,43 +76,10 @@ cp -r runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/rose/bin
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
-BOTH="runRoseUtil"
 
-CORE="rose-c++ \
-rose-cc \
-rose-config \
-rose-compiler \
-libtool"
+TOOLS=$(cat MakeInstallFile/rose-tools.bin)
 
-TOOLS="ArrayProcessor \
-KeepGoingTranslator \
-astCopyReplTest \
-astRewriteExample1 \
-autoPar \
-autoTuning \
-codeInstrumentor \
-compassEmptyMain \
-compassMain \
-compassVerifier \
-defaultTranslator \
-dotGenerator \
-dotGeneratorWholeASTGraph \
-extractMPISkeleton \
-generateSignatures \
-identityTranslator \
-mangledNameDumper \
-measureTool \
-moveDeclarationToInnermostScope \
-pdfGenerator \
-preprocessingInfoDumper \
-qualifiedNameDumper \
-rajaChecker \
-roseupcc \
-sampleCompassSubset \
-summarizeSignatures \
-typeforge"
-
-for util in $BOTH $CORE $TOOLS; do
+for util in $TOOLS; do
 	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
 	if [ "$?" != "0" ]; then exit 1; fi
 done
@@ -123,26 +102,12 @@ sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelo
 echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
-#Split Package
-cp -r $ROSE_DEBIAN_BINARY_ROOT $ROSE_DEBIAN_BINARY_ROOT_TOOLS
-
-for util in $TOOLS; do
-	rm -rf $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util $ROSE_DEBIAN_BINARY_ROOT/usr/rose/bin/$util
-done
-
-for util in $CORE; do
-	rm -rf $ROSE_DEBIAN_BINARY_ROOT_TOOLS/usr/bin/$util $ROSE_DEBIAN_BINARY_ROOT_TOOLS/usr/rose/bin/$util
-done
-rm -rf $ROSE_DEBIAN_BINARY_ROOT_TOOLS/usr/rose/include $ROSE_DEBIAN_BINARY_ROOT_TOOLS/usr/rose/lib
-cp control-tools $ROSE_DEBIAN_BINARY_ROOT_TOOLS/debian/control
-sed -i -e '0,/rose/s/rose/rose-tools/' $ROSE_DEBIAN_BINARY_ROOT_TOOLS/debian/changelog
+cp MakeInstallFile/*.install $ROSE_DEBIAN_BINARY_ROOT/debian
 
 # remove possible stale package
 rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
-rm -rf rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
 
 tar cfz rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT
-tar cfz rose-tools_$(cat rose/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT_TOOLS
 
 #--------sign your binary 
 ROOT=`pwd`
@@ -175,5 +140,4 @@ else
 fi
 
 (cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
-(cd $ROSE_DEBIAN_BINARY_ROOT_TOOLS/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
 

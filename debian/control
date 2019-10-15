@@ -5,8 +5,16 @@ Build-Depends: debhelper (>= 9)
 
 Package: rose
 Architecture: amd64
-Depends: libgcc1, openjdk-8-jre-headless, gcc-7, g++-7, gfortran-7, libboost-chrono-dev, libboost-date-time-dev, libboost-filesystem-dev, libboost-iostreams-dev, libboost-program-options-dev, libboost-random-dev, libboost-regex-dev, libboost-serialization-dev, libboost-signals-dev, libboost-system-dev, libboost-thread-dev, libboost-wave-dev
+Depends: libgcc1, openjdk-8-jre-headless, gcc-7, g++-7, gfortran-7, libboost-chrono-dev, libboost-date-time-dev, libboost-filesystem-dev, libboost-iostreams-dev, libboost-program-options-dev, libboost-random-dev, libboost-regex-dev, libboost-serialization-dev, libboost-signals-dev, libboost-system-dev, libboost-thread-dev, libboost-wave-dev, python, perl-doc
 Description: ROSE compiler infrastructure
  ROSE compiler infrastructure
  .
- Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications.
+ Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Contains the core functions of ROSE.
+
+Package: rose-tools
+Architecture: amd64
+Depends: rose
+Description: ROSE compiler infrastructure tools
+ ROSE compiler infrastructure
+ .
+ Developed at Lawrence Livermore National Laboratory (LLNL), ROSE is an open source compiler infrastructure to build source-to-source program transformation and analysis tools for large-scale C (C89 and C98), C++ (C++98 and C++11), UPC, Fortran (77/95/2003), OpenMP, Java, Python and PHP applications. Includes many ROSE based tools.

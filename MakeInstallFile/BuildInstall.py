@@ -72,8 +72,11 @@ if __name__ == '__main__':
            
     for tool in fileLists.keys():
         fileLists[tool].sort() 
+
         installFile = open(tool + '.install', 'w')
         for name in fileLists[tool]:
-            installFile.write('usr/rose/' + name + ' /usr/rose/' + name + '\n')
+            sourceFileName = 'usr/rose/' + name
+            destFileName = '/' + '/'.join(sourceFileName.split('/')[:-1])
+            installFile.write(sourceFileName + ' ' + destFileName + '\n')
         for binFile in bins[tool]: 
-            installFile.write('usr/bin/' + binFile + ' /usr/bin/' + binFile + '\n')
+            installFile.write('usr/bin/' + binFile + ' /usr/bin/' +  '\n')
