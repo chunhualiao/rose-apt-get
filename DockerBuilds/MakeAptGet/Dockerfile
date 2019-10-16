@@ -26,4 +26,4 @@ RUN apt-get update -y && \
         wget 
 COPY .gnupg /root/.gnupg
 COPY build-ROSE.sh /usr/local/bin/build-ROSE.sh
-CMD build-ROSE.sh ; bash
+ENTRYPOINT ["build-ROSE.sh"]

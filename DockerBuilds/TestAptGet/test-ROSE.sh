@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+if [ "$1" == "stable" ]; then
+	sed -i 's/development/stable/g' /etc/apt/sources.list
+fi
 cd
 apt-get update
 apt-get install -y rose-tools

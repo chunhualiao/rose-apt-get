@@ -51,16 +51,21 @@ if [ "$?" != "0" ]; then exit 1; fi
 #(cd rose-build && make core -j4)
 #if [ "$?" != "0" ]; then exit 1; fi
 
+# Moving of libtool is tempory solution to prevent install
 export DESTDIR=$ROOT/rose-install
 # Build Core
 (cd rose-build && make DESTDIR=$ROOT/rose-install install-core -j40)
+mv rose-install/usr/rose/bin/libtool ./
 (cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose.find)
 (cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose.bin)
+mv ./libtool rose-install/usr/rose/bin/
 echo "runRoseUtil" >>MakeInstallFile/rose.bin
 # Build Tools
 (cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j40)
+mv rose-install/usr/rose/bin/libtool ./
 (cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose-tools.find)
 (cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose-tools.bin)
+mv ./libtool rose-install/usr/rose/bin/
 echo "runRoseUtil" >>MakeInstallFile/rose-tools.bin
 if [ "$?" != "0" ]; then exit 1; fi
 

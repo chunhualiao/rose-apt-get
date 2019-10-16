@@ -11,4 +11,4 @@ RUN apt-get install -y vim git
 COPY rose_hello-world.c /root/rose_hello-world.c 
 COPY rose_hello-world.cpp /root/rose_hello-world.cpp 
 COPY test-ROSE.sh /usr/local/bin/test-ROSE.sh
-CMD test-ROSE.sh ; bash
+ENTRYPOINT ["test-ROSE.sh"]
