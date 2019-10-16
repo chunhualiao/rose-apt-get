@@ -73,25 +73,17 @@ Assuming the user account is user1 again, within Ubuntu, type the following to i
 sudo apt-get install -y software-properties-common
 sudo add-apt-repository ppa:user1/rose
 sudo apt-get update
-sudo apt-get install rose   
+sudo apt-get install rose 
+sudo apt-get install rose rose-tools  
 ```
 
 We have an experimental package built and uploaded. You can try it out using the following command lines (tested on Ubuntu 18.04 bionic):
 
 ```
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository ppa:gleison14051994/rose
-sudo apt-get update
+sudo apt-get install software-properties-common
+sudo add-apt-repository ppa:rosecompiler/rose-development
 sudo apt-get install rose
-```
-
-However, rose depends of libicu55. It is currently supported until Ubuntu 16.04 Xenial, but it is compatible with 18.04 Bionic.
-Here is how to install quickly libicu55:
-```
-sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
-sudo apt-get update
-sudo apt-get install libicu55
-
+sudo apt-get install rose-tools # Optional: Installs ROSE tools in addition to ROSE Coree
 ```
 
 The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
