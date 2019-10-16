@@ -2,7 +2,7 @@
 set -e
 
 cd
-git clone -b pinnow2 https://github.com/chunhualiao/rose-apt-get.git
+git clone https://github.com/chunhualiao/rose-apt-get.git
 cd rose-apt-get
 ./build.sh
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
