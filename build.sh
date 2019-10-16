@@ -24,7 +24,7 @@ ROOT=$(pwd)
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
 	git clone -b $BRANCH https://github.com/rose-compiler/rose
-	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
+	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am
 	echo $(cat rose/ROSE_VERSION).$APT_ROSE_VERSION >|rose/ROSE_VERSION
         if [ "$?" != "0" ]; then exit 1; fi
 fi
