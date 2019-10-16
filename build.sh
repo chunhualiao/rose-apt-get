@@ -8,16 +8,24 @@ if [ "$EUID" -ne 0 ]
 #  echo "You are running with root priviledge as expected..."
 fi
 
+if [ $# == 0 ]; then
+	APT_ROSE_VERSION=0
+	BRANCH=develop
+else
+	APT_ROSE_VERSION=$1
+	BRANCH=$2
+fi
 ROOT=$(pwd)
 
 #-------------------- install dependent software
-sudo apt update
-sudo apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript python lsb-core perl-doc libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
+#apt update
+#apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript python lsb-core perl-doc libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
 
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
-	git clone https://github.com/rose-compiler/rose
-	(patch -p3 rose/Makefile.am 0001-fix-rosePublicConfig.h-DESTDIR.patch)
+	git clone -b $BRANCH https://github.com/rose-compiler/rose
+	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
+	echo $(cat rose/ROSE_VERSION).$APT_ROSE_VERSION >|rose/ROSE_VERSION
         if [ "$?" != "0" ]; then exit 1; fi
 fi
 
@@ -32,7 +40,7 @@ fi
 
 # note that --prefix is set to be /usr/rose
 # so this script must use sudo priviledge to run!!
-(cd rose-build && CC=gcc-7 CXX=g++-7 CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++ --without-java --enable-edg_version=5.0 --disable-boost-version-check --disable-tests-directory)
+(cd rose-build && CC=gcc-7 CXX=g++-7 CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,binaries --without-java --enable-edg_version=5.0 --disable-boost-version-check --disable-tests-directory)
 if [ "$?" != "0" ]; then exit 1; fi
 
 #-------------------- build ROSE
@@ -44,13 +52,26 @@ if [ "$?" != "0" ]; then exit 1; fi
 #if [ "$?" != "0" ]; then exit 1; fi
 
 export DESTDIR=$ROOT/rose-install
-(cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j4)
+# Build Core
+(cd rose-build && make DESTDIR=$ROOT/rose-install install-core -j40)
+(cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose.find)
+(cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose.bin)
+echo "runRoseUtil" >>MakeInstallFile/rose.bin
+# Build Tools
+(cd rose-build && make DESTDIR=$ROOT/rose-install install-tools -j40)
+(cd rose-install/usr/rose/ && find . -type f,l >|../../../MakeInstallFile/rose-tools.find)
+(cd rose-install/usr/rose/bin/ && ls >|../../../../MakeInstallFile/rose-tools.bin)
+echo "runRoseUtil" >>MakeInstallFile/rose-tools.bin
 if [ "$?" != "0" ]; then exit 1; fi
 
+# Make .install Files
+(cd MakeInstallFile && python BuildInstall.py)
+echo "usr/rose/bin/runRoseUtil /usr/rose/bin" >>MakeInstallFile/rose.install
 sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
  
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
 ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
+ROSE_DEBIAN_BINARY_ROOT_TOOLS=rose-tools-$ROSE_VERSION
 
 # support reentry of this script
 if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT" ]; then
@@ -63,9 +84,9 @@ if [ ! -d "$ROSE_DEBIAN_BINARY_ROOT/usr/bin" ]; then
   mkdir -p $ROSE_DEBIAN_BINARY_ROOT/usr/bin
 fi
 
-UTILS="astCopyReplTest defuseAnalysis outline virtualCFG astRewriteExample1 dotGenerator livenessAnalysis pdfGenerator xgenTranslator autoPar dotGeneratorWholeASTGraph loopProcessor preprocessingInfoDumper buildCallGraph identityTranslator mangledNameDumper qualifiedNameDumper codeInstrumentor interproceduralCFG measureTool rajaChecker defaultTranslator KeepGoingTranslator moveDeclarationToInnermostScope rose-config"
+TOOLS=$(cat MakeInstallFile/rose-tools.bin)
 
-for util in $UTILS; do
+for util in $TOOLS; do
 	(ln -fs ../rose/bin/runRoseUtil $ROSE_DEBIAN_BINARY_ROOT/usr/bin/$util)
 	if [ "$?" != "0" ]; then exit 1; fi
 done
@@ -85,6 +106,10 @@ cp -r debian/* $ROSE_DEBIAN_BINARY_ROOT/debian/
 echo sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 
+echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+
+cp MakeInstallFile/*.install $ROSE_DEBIAN_BINARY_ROOT/debian
 
 # remove possible stale package
 rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
@@ -122,5 +147,4 @@ else
 fi
 
 (cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
-
 
