@@ -10,8 +10,10 @@ fi
 
 if [ $# == 0 ]; then
 	APT_ROSE_VERSION=0
+	BRANCH=develop
 else
 	APT_ROSE_VERSION=$1
+	BRANCH=$2
 fi
 ROOT=$(pwd)
 
@@ -21,7 +23,7 @@ ROOT=$(pwd)
 
 #-------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
-	git clone https://github.com/rose-compiler/rose
+	git clone -b $BRANCH https://github.com/rose-compiler/rose
 	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am >|temp.txt
 	echo $(cat rose/ROSE_VERSION).$APT_ROSE_VERSION >|rose/ROSE_VERSION
         if [ "$?" != "0" ]; then exit 1; fi
@@ -38,7 +40,7 @@ fi
 
 # note that --prefix is set to be /usr/rose
 # so this script must use sudo priviledge to run!!
-(cd rose-build && CC=gcc-7 CXX=g++-7 CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++ --without-java --enable-edg_version=5.0 --disable-boost-version-check --disable-tests-directory)
+(cd rose-build && CC=gcc-7 CXX=g++-7 CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,binaries --without-java --enable-edg_version=5.0 --disable-boost-version-check --disable-tests-directory)
 if [ "$?" != "0" ]; then exit 1; fi
 
 #-------------------- build ROSE
