@@ -67,6 +67,7 @@ if [ "$?" != "0" ]; then exit 1; fi
 # Make .install Files
 (cd MakeInstallFile && python BuildInstall.py)
 echo "usr/rose/bin/runRoseUtil /usr/rose/bin" >>MakeInstallFile/rose.install
+echo "etc" >>MakeInstallFile/rose.install
 sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
  
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
