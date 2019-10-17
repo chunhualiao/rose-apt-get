@@ -1,19 +1,19 @@
 #!/bin/bash
 set -e
 
-if [ $# >= 3 ]; then
+if [ $# -gt 2 ]; then
 	PPA=$3
 else
 	PPA=rose-development
 fi
 
-if [ $# >= 2 ]; then
+if [ $# -gt 1 ]; then
 	BRANCH=$2
 else
 	BRANCH=develop
 fi
 
-if [ $# >= 1 ]; then
+if [ $# -gt 0 ]; then
 	APT_VERSION=$1
 else
 	APT_VERSION=0
