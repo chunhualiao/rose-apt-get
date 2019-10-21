@@ -69,6 +69,8 @@ mv ./libtool rose-install/usr/rose/bin/
 echo "runRoseUtil" >>MakeInstallFile/rose-tools.bin
 if [ "$?" != "0" ]; then exit 1; fi
 
+(cd rose-build && make check-core)
+
 # Make .install Files
 (cd MakeInstallFile && python BuildInstall.py)
 echo "usr/rose/bin/runRoseUtil /usr/rose/bin" >>MakeInstallFile/rose.install
