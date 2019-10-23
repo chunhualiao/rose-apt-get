@@ -4,10 +4,9 @@ set -e
 if [ "$EUID" -ne 0 ]
   then echo "Please run as root since we will use --prefix=/usr/rose for the installation, like sudo this-script"
   exit
-#else
-#  echo "You are running with root priviledge as expected..."
 fi
 
+# Grab command line argument to change apt-get version tag or rose branch
 if [ $# == 0 ]; then
 	APT_ROSE_VERSION=0
 	BRANCH=develop
@@ -15,13 +14,27 @@ else
 	APT_ROSE_VERSION=$1
 	BRANCH=$2
 fi
+
+# Get ubuntu version and set the version of gcc
+CODENAME=$(cat etc/os-release | grep VERSION_CODENAME | sed 's/VERSION_CODENAME=//g')
+
+if [ $CODENAME == xenial ] ; then 
+  GCC_VERSION=5
+  SUPPORTED_LANGUAGES=c,c++,binaries
+elif [ $CODENAME == bionic ] ; then
+  GCC_VERSION=7
+  SUPPORTED_LANGUAGES=c,c++,binaries
+elif [ $CODENAME == eoan ] ; then 
+  GCC_VERSION=9
+  SUPPORTED_LANGUAGES=c,binaries
+else
+  echo "Unsupported version of ubuntu"
+  exit 1
+fi
+
 ROOT=$(pwd)
 
-#-------------------- install dependent software
-#apt update
-#apt install -y make gfortran gcc-7 g++-7 gfortran-7 libxml2-dev texlive git automake autoconf libtool flex bison openjdk-8-jdk debhelper devscripts ghostscript python lsb-core perl-doc libboost-{chrono,date-time,filesystem,iostreams,program-options,random,regex,serialization,signals,system,thread,wave}-dev
-
-#-------------------- clone and configure ROSE
+#---------------------------------------------------------------------------------- clone and configure ROSE
 if [ ! -d "rose" ]; then
 	git clone -b $BRANCH https://github.com/rose-compiler/rose
 	sed -i "s/\$(pkgincludedir)/\$(DESTDIR)\$(pkgincludedir)/g" rose/Makefile.am
@@ -40,16 +53,10 @@ fi
 
 # note that --prefix is set to be /usr/rose
 # so this script must use sudo priviledge to run!!
-(cd rose-build && CC=gcc-7 CXX=g++-7 CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=c,c++,binaries --without-java --enable-edg_version=5.0 --disable-boost-version-check --disable-tests-directory)
+(cd rose-build && CC=gcc-$GCC_VERSION CXX=g++-$GCC_VERSION CXXFLAGS= ../rose/configure --prefix=/usr/rose --with-boost=/usr --with-boost-libdir=/usr/lib/x86_64-linux-gnu/ --enable-languages=$SUPPORTED_LANGUAGES --without-java --disable-boost-version-check --disable-tests-directory)
 if [ "$?" != "0" ]; then exit 1; fi
 
-#-------------------- build ROSE
-# -j$(nproc) may cause memory consumption issue on a virtual machine with limited memory. We use 2 process to be safe
-#(cd rose-build && make core -j$(nproc) && make DESTDIR=$ROOT/rose-install install-core -j$(nproc))
-#(cd rose-build e -j4)
-
-#(cd rose-build && make core -j4)
-#if [ "$?" != "0" ]; then exit 1; fi
+#------------------------------------------------------------------------------------------------ build ROSE
 
 # Moving of libtool is tempory solution to prevent install
 export DESTDIR=$ROOT/rose-install
@@ -75,7 +82,6 @@ if [ "$?" != "0" ]; then exit 1; fi
 (cd MakeInstallFile && python BuildInstall.py)
 echo "usr/rose/bin/runRoseUtil /usr/rose/bin" >>MakeInstallFile/rose.install
 echo "etc" >>MakeInstallFile/rose.install
-sed -i '1s/^/#define __builtin_bswap16 __bswap_constant_16\n/' $ROOT/rose-install/usr/rose/include/edg/g++-7_HEADERS/hdrs7/bits/byteswap.h
  
 ROSE_VERSION=$(cat rose/ROSE_VERSION)
 ROSE_DEBIAN_BINARY_ROOT=rose-$ROSE_VERSION
@@ -116,6 +122,12 @@ sed -i -e "s/\$VERSION/$ROSE_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelo
 
 echo sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
 sed -i -e "s/DATE/$(date -R)/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+
+echo sed -i -e "s/CODENAME/$CODENAME/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+sed -i -e "s/CODENAME/$CODENAME/g" $ROSE_DEBIAN_BINARY_ROOT/debian/changelog
+
+echo sed -i -e "s/GCCVERSION/$GCC_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/control
+sed -i -e "s/GCCVERSION/$GCC_VERSION/g" $ROSE_DEBIAN_BINARY_ROOT/debian/control
 
 cp MakeInstallFile/*.install $ROSE_DEBIAN_BINARY_ROOT/debian
 
