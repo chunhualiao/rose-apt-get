@@ -16,7 +16,7 @@ else
 fi
 
 # Get ubuntu version and set the version of gcc
-CODENAME=$(cat etc/os-release | grep VERSION_CODENAME | sed 's/VERSION_CODENAME=//g')
+CODENAME=$(cat /etc/os-release | grep VERSION_CODENAME | sed 's/VERSION_CODENAME=//g')
 
 if [ $CODENAME == xenial ] ; then 
   GCC_VERSION=5
