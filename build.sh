@@ -139,33 +139,14 @@ rm -rf rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz
 tar cfz rose_$(cat rose/ROSE_VERSION)-2.orig.tar.gz $ROSE_DEBIAN_BINARY_ROOT
 
 #--------sign your binary 
-ROOT=`pwd`
-echo "current path is $ROOT"
 
-if [ ! -f "$ROOT/pubkey" ]; then
-        keyVal=$(gpg --list-keys | sed -n 4p | tail -c 9)
-        echo "${keyVal##*/}" > $ROOT/pubkey
-fi
+SIGN_KEY=$(gpg --list-public-keys --with-fingerprint --with-colons | sed -n '3p' | cut -d: -f10)
 
-SIGN_KEY=$(cat $ROOT/pubkey)
-
-echo $SIGN_KEY
 if [ "x$SIGN_KEY" == "x" ]; then
-
-#somehow pubkey may be emtpy!
-# we regenerate it again
-  rm -rf $ROOT/pubkey
-  keyVal=$(gpg --list-keys | sed -n 4p | tail -c 9)
-  echo "${keyVal##*/}" > $ROOT/pubkey
-
-  if [ "x$SIGN_KEY" == "x" ]; then
-
-    echo "Error, cannot find your public GPG key, aborting..."
-    echo "Please create or import your key pairs to this machine"
-    exit 1;
-  fi
+  #somehow pubkey may be emtpy!
+  echo "Cannot find public key"
 else
-  echo the public key found is: $SIGN_KEY
+  echo "Public Key: $SIGN_KEY"
 fi
 
 (cd $ROSE_DEBIAN_BINARY_ROOT/debian && debuild --no-tgz-check -S -sa -k$SIGN_KEY)
