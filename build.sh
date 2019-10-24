@@ -16,17 +16,17 @@ else
 fi
 
 # Get ubuntu version and set the version of gcc
+SUPPORTED_LANGUAGES=c,c++,binaries
 CODENAME=$(cat /etc/os-release | grep VERSION_CODENAME | sed 's/VERSION_CODENAME=//g')
 
 if [ $CODENAME == xenial ] ; then 
   GCC_VERSION=5
-  SUPPORTED_LANGUAGES=c,c++,binaries
 elif [ $CODENAME == bionic ] ; then
   GCC_VERSION=7
-  SUPPORTED_LANGUAGES=c,c++,binaries
+elif [ $CODENAME == disco ] ; then
+  GCC_VERSION=8
 elif [ $CODENAME == eoan ] ; then 
   GCC_VERSION=9
-  SUPPORTED_LANGUAGES=c,binaries
 else
   echo "Unsupported version of ubuntu"
   exit 1
