@@ -15,20 +15,24 @@ else
 	BRANCH=$2
 fi
 
-# Get ubuntu version and set the version of gcc
+# Get OS version and set the version of gcc
 SUPPORTED_LANGUAGES=c,c++,binaries
 CODENAME=$(cat /etc/os-release | grep VERSION_CODENAME | sed 's/VERSION_CODENAME=//g')
 
-if [ $CODENAME == xenial ] ; then 
+if [ $CODENAME == xenial ] ; then  #Ubuntu 16.04
   GCC_VERSION=5
-elif [ $CODENAME == bionic ] ; then
+elif [ $CODENAME == bionic ] ; then #Ubuntu 18.04
   GCC_VERSION=7
-elif [ $CODENAME == disco ] ; then
+elif [ $CODENAME == disco ] ; then #Ubuntu 19.04
   GCC_VERSION=8
-elif [ $CODENAME == eoan ] ; then 
+elif [ $CODENAME == eoan ] ; then #Ubuntu 19.10
   GCC_VERSION=9
+elif [ $CODENAME == stretch ] ; then #Debian 9
+  GCC_VERSION=6
+elif [ $CODENAME == buster ] ; then #Debian 10
+  GCC_VERSION=8
 else
-  echo "Unsupported version of ubuntu"
+  echo "Unsupported version of OS"
   exit 1
 fi
 
