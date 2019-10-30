@@ -27,10 +27,6 @@ elif [ $CODENAME == disco ] ; then #Ubuntu 19.04
   GCC_VERSION=8
 elif [ $CODENAME == eoan ] ; then #Ubuntu 19.10
   GCC_VERSION=9
-elif [ $CODENAME == stretch ] ; then #Debian 9
-  GCC_VERSION=6
-elif [ $CODENAME == buster ] ; then #Debian 10
-  GCC_VERSION=8
 else
   echo "Unsupported version of OS"
   exit 1
