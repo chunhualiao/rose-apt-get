@@ -83,7 +83,7 @@ We have an experimental package built and uploaded. You can try it out using the
 sudo apt-get install software-properties-common
 sudo add-apt-repository ppa:rosecompiler/rose-development
 sudo apt-get install rose
-sudo apt-get install rose-tools # Optional: Installs ROSE tools in addition to ROSE Coree
+sudo apt-get install rose-tools # Optional: Installs ROSE tools in addition to ROSE Core library and executables.
 ```
 
 The installed ROSE binaries, headers and libraries are located under /usr/rose with symbolic links under /usr/bin 
