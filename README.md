@@ -92,3 +92,7 @@ The installed ROSE binaries, headers and libraries are located under /usr/rose w
 /usr/rose$ ls
 bin include lib  
 ```
+
+## Check what files are installed
+
+dpkg-query -L rose | more
