@@ -101,4 +101,4 @@ dpkg-query -L rose-tools | more
 The current files being installed are listed in
 * [Installed files by apt get install rose
 ](https://github.com/chunhualiao/rose-apt-get/wiki/Installed-files-by-apt-get-install-rose)
-* [Installed files by apt get install rose tools] (https://github.com/chunhualiao/rose-apt-get/wiki/Installed-files-by-apt-get-install-rose-tools)
+* [Installed files by apt get install rose tools](https://github.com/chunhualiao/rose-apt-get/wiki/Installed-files-by-apt-get-install-rose-tools)
